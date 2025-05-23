@@ -1,16 +1,16 @@
-import * as net from "net";
+import { Socket } from "net";
 
-export function createBridge(socketA: net.Socket, socketB: net.Socket) {
-  socketA.on("data", (data) => socketB.write(data));
-  socketB.on("data", (data) => socketA.write(data));
-
-  const closeBoth = () => {
-    socketA.destroy();
-    socketB.destroy();
+export function createBridge(a: Socket, b: Socket) {
+  const closeAll = () => {
+    a.destroy();
+    b.destroy();
   };
 
-  socketA.on("close", closeBoth);
-  socketB.on("close", closeBoth);
-  socketA.on("error", closeBoth);
-  socketB.on("error", closeBoth);
+  a.on("data", (chunk) => b.write(chunk));
+  b.on("data", (chunk) => a.write(chunk));
+
+  a.on("close", closeAll);
+  b.on("close", closeAll);
+  a.on("error", closeAll);
+  b.on("error", closeAll);
 }

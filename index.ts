@@ -1,5 +1,6 @@
 import { server } from "./src/socket";
 
-server.listen(9000, () => {
-  console.log("Servidor TCP escutando na porta 9000");
+const PORT = 9000;
+server.listen(PORT, () => {
+  console.log(`Servidor TCP escutando na porta ${PORT}`);
 });
