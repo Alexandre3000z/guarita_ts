@@ -1,4 +1,4 @@
-import { server } from "./socket";
+import { server } from "./src/socket";
 
 const PORT = 9000;
 server.listen(PORT, () => {
