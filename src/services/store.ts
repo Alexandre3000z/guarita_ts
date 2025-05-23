@@ -1,4 +1,4 @@
-import { GuaritaInfo } from "../types";
+import { GuaritaInfo, SocketExt } from "../types";
 import { Socket } from "net";
 
 const guaritas = new Map<string, GuaritaInfo>();
@@ -17,32 +17,22 @@ export function registerGuarita(
 
   info.lastSeen = Date.now();
 
-  // Se já existe esse socket, não adiciona de novo
-  if (!info.sockets.includes(socket)) {
-    info.sockets.push(socket);
-
-    // Quando o socket fechar ou der erro, remove-o automaticamente
-    const cleanup = () => removeSocket(mac, socket);
-    socket.on("close", cleanup);
-    socket.on("error", cleanup);
+  // Substitui sockets antigos (opcional) ou limpa depois
+  if (info.sockets.length > 0) {
+    info.sockets.forEach((s) => s.destroy());
+    info.sockets = [];
   }
+
+  info.sockets.push(socket);
+
+  const cleanup = () => removeSocket(mac, socket);
+  socket.on("close", cleanup);
+  socket.on("error", cleanup);
 }
 
-// NOVO: simplesmente atualiza o lastSeen
 export function touchGuarita(mac: string) {
   const info = guaritas.get(mac);
-  if (info) {
-    info.lastSeen = Date.now();
-    // opcional: console.log(`Keep-alive recebido de ${mac}`);
-  }
-}
-
-export function removeGuarita(mac: string) {
-  const info = guaritas.get(mac);
-  if (info) {
-    info.sockets.forEach((s) => s.destroy());
-    guaritas.delete(mac);
-  }
+  if (info) info.lastSeen = Date.now();
 }
 
 export function findGuaritaByPassword(password: string) {
@@ -54,27 +44,25 @@ export function findGuaritaByPassword(password: string) {
   return null;
 }
 
+export function removeSocket(mac: string, sock: Socket) {
+  const info = guaritas.get(mac);
+  if (!info) return;
+  info.sockets = info.sockets.filter((s) => s !== sock);
+  if (info.sockets.length === 0) {
+    console.log(`Todas conexões da guarita ${mac} encerradas; removendo-a.`);
+    guaritas.delete(mac);
+  }
+}
+
 export function monitorKeepAlive() {
   setInterval(() => {
     const now = Date.now();
     for (const [mac, info] of guaritas.entries()) {
       if (info.keepAlive > 0 && now - info.lastSeen > info.keepAlive * 1000) {
         console.warn(`Keep-alive expirado para ${mac}, removendo.`);
-        removeGuarita(mac);
+        info.sockets.forEach((s) => s.destroy());
+        guaritas.delete(mac);
       }
     }
   }, 5000);
-}
-
-// Remove apenas um socket do array; se ficar vazio, remove a guarita inteira
-export function removeSocket(mac: string, sock: Socket) {
-  const info = guaritas.get(mac);
-  if (!info) return;
-
-  info.sockets = info.sockets.filter((s) => s !== sock);
-
-  if (info.sockets.length === 0) {
-    console.log(`Todas conexões da guarita ${mac} encerradas; removendo-a.`);
-    guaritas.delete(mac);
-  }
 }
