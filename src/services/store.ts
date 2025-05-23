@@ -14,9 +14,17 @@ export function registerGuarita(
     info = { sockets: [], password, keepAlive, lastSeen: Date.now() };
     guaritas.set(mac, info);
   }
+
   info.lastSeen = Date.now();
+
+  // Se já existe esse socket, não adiciona de novo
   if (!info.sockets.includes(socket)) {
     info.sockets.push(socket);
+
+    // Quando o socket fechar ou der erro, remove-o automaticamente
+    const cleanup = () => removeSocket(mac, socket);
+    socket.on("close", cleanup);
+    socket.on("error", cleanup);
   }
 }
 
@@ -56,4 +64,17 @@ export function monitorKeepAlive() {
       }
     }
   }, 5000);
+}
+
+// Remove apenas um socket do array; se ficar vazio, remove a guarita inteira
+export function removeSocket(mac: string, sock: Socket) {
+  const info = guaritas.get(mac);
+  if (!info) return;
+
+  info.sockets = info.sockets.filter((s) => s !== sock);
+
+  if (info.sockets.length === 0) {
+    console.log(`Todas conexões da guarita ${mac} encerradas; removendo-a.`);
+    guaritas.delete(mac);
+  }
 }
