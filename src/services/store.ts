@@ -20,6 +20,15 @@ export function registerGuarita(
   }
 }
 
+// NOVO: simplesmente atualiza o lastSeen
+export function touchGuarita(mac: string) {
+  const info = guaritas.get(mac);
+  if (info) {
+    info.lastSeen = Date.now();
+    // opcional: console.log(`Keep-alive recebido de ${mac}`);
+  }
+}
+
 export function removeGuarita(mac: string) {
   const info = guaritas.get(mac);
   if (info) {
