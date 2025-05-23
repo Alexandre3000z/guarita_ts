@@ -20,5 +20,9 @@
   "homepage": "https://github.com/Alexandre3000z/guarita_ts#readme",
   "dependencies": {
     "net": "^1.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "typescript": "^5.8.3"
   }
 }

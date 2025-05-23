@@ -1,18 +1,18 @@
-import * as net from 'net';
+import { createServer, Socket } from "net";
 
-const server = net.createServer((socket) => {
-  console.log('Cliente conectado');
+export const server = createServer((client: Socket) => {
+  console.log("Cliente conectado:", client.remoteAddress, client.remotePort);
 
-  socket.on('data', (data) => {
-    console.log('Recebido:', data.toString());
-    // Processar dados e responder
+  client.on("data", (data) => {
+    console.log("Recebido do cliente:", data.toString());
+    // aqui você processa e, se for bridge, envia para outro socket…
   });
 
-  socket.on('end', () => {
-    console.log('Cliente desconectado');
+  client.on("end", () => {
+    console.log("Cliente desconectou");
   });
-});
 
-server.listen(9000, () => {
-  console.log('Servidor TCP escutando na porta 9000');
+  client.on("error", (err) => {
+    console.error("Erro no socket do cliente:", err);
+  });
 });
