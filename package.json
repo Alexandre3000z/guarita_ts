@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/Alexandre3000z/guarita_ts#readme",
   "dependencies": {
+    "date-fns": "^4.1.0",
     "net": "^1.0.2"
   },
   "devDependencies": {
