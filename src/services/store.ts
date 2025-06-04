@@ -66,3 +66,17 @@ export function monitorKeepAlive() {
     }
   }, 5000);
 }
+
+export function getGuaritas() {
+  return Array.from(guaritas.entries()).map(([mac, info]) => ({
+    mac,
+    password: info.password,
+    socketsCount: info.sockets.length,
+    lastSeen: new Date(info.lastSeen).toLocaleString(),
+    keepAlive: info.keepAlive,
+    active: info.sockets.length > 0  // Adiciona flag de ativo
+  }));
+}
+
+
+export { guaritas };

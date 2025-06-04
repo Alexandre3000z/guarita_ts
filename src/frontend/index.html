@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Monitor de Guaritas</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <h1>Guaritas Conectadas</h1>
+  <button id="refresh-btn">Atualizar Lista</button>
+  <div id="guaritas-list">
+    <p class="empty">Clique no botão para carregar as guaritas</p>
+  </div>
+
+  <script>
+    document.getElementById('refresh-btn').addEventListener('click', loadGuaritas);
+
+    async function loadGuaritas() {
+      try {
+        const response = await fetch('/api/guaritas');
+        const guaritas = await response.json();
+        updateList(guaritas);
+      } catch (error) {
+        console.error('Erro ao carregar guaritas:', error);
+        document.getElementById('guaritas-list').innerHTML = 
+          '<p class="error">Erro ao carregar dados</p>';
+      }
+    }
+
+    function updateList(guaritas) {
+      const listElement = document.getElementById('guaritas-list');
+      
+      if (guaritas.length === 0) {
+        listElement.innerHTML = '<p class="empty">Nenhuma guarita conectada</p>';
+        return;
+      }
+
+      listElement.innerHTML = guaritas.map(guarita => `
+        <div class="guarita-card">
+          <h2>${guarita.mac}</h2>
+          <p><strong>Senha:</strong> ${guarita.password}</p>
+          <p><strong>Conexões:</strong> ${guarita.socketsCount}</p>
+          <p><strong>Última atividade:</strong> ${guarita.lastSeen}</p>
+          <p><strong>Keep-alive:</strong> ${guarita.keepAlive}s</p>
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>
