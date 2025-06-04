@@ -1,0 +1,59 @@
+body {
+  font-family: Arial, sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  color: #333;
+  text-align: center;
+}
+
+.guarita-card {
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.guarita-card h2 {
+  margin-top: 0;
+  color: #444;
+}
+
+.empty {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+#refresh-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+#refresh-btn:hover {
+  background-color: #45a049;
+}
+
+.empty, .error {
+  text-align: center;
+  padding: 20px;
+}
+
+.empty {
+  color: #666;
+  font-style: italic;
+}
+
+.error {
+  color: #d32f2f;
+  font-weight: bold;
+}
